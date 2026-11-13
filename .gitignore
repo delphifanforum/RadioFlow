@@ -1,0 +1,27 @@
+## .NET / Visual Studio
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+publish/
+artifacts/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+.idea/
+*.swp
+TestResults/
+*.trx
+*.coverage
+*.log
+## Paketleme
+packaging/out/
+*.msix
+*.appx
+## Yerel veri (uygulama verisi %LOCALAPPDATA% altında tutulur, depoya girmez)
+*.db
+*.db-shm
+*.db-wal

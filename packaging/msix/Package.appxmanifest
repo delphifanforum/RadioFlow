@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  RadioFlow MSIX manifest şablonu (Faz 4 altyapısı).
+  - Publisher değeri imzalama sertifikanızın Subject değeriyle AYNI olmalıdır.
+  - Microsoft Store'a gönderimde Identity/Publisher değerleri Partner Center'dan alınır.
+  - StartupTask "RadioFlowStartup" kimliği uygulamadaki StartupServiceSelector.StartupTaskId ile eşleşir.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap5 desktop rescap">
+
+  <Identity Name="RadioFlow.InternetRadio" Publisher="CN=RadioFlow Dev" Version="0.1.0.0" ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>RadioFlow</DisplayName>
+    <PublisherDisplayName>RadioFlow</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Windows 11 için modern internet radyosu widget'ı</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="tr-TR" />
+  </Resources>
+
+  <Applications>
+    <Application Id="RadioFlow" Executable="RadioFlow.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="RadioFlow" Description="İnternet radyosu"
+                          BackgroundColor="transparent"
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <!-- Kullanıcı ayarlardan etkinleştirmedikçe kapalı (Enabled="false"). -->
+        <uap5:Extension Category="windows.startupTask">
+          <uap5:StartupTask TaskId="RadioFlowStartup" Enabled="false" DisplayName="RadioFlow" />
+        </uap5:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

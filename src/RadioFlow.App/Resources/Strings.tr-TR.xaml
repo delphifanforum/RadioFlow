@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <!--
+    Dil altyapısı: arayüz metinleri bu sözlükten DynamicResource ile okunur.
+    Yeni bir dil için aynı anahtarlarla Strings.<kültür>.xaml oluşturup App.xaml.cs içindeki
+    LoadStrings çağrısına eklemek yeterlidir. Şu an yalnızca Türkçe mevcuttur.
+  -->
+  <sys:String x:Key="Str.AppName">RadioFlow</sys:String>
+  <sys:String x:Key="Str.Search">Radyo, tür veya şehir ara…</sys:String>
+  <sys:String x:Key="Str.AddStation">İstasyon Ekle</sys:String>
+  <sys:String x:Key="Str.Settings">Ayarlar</sys:String>
+  <sys:String x:Key="Str.Back">Geri</sys:String>
+  <sys:String x:Key="Str.Refresh">Yenile</sys:String>
+  <sys:String x:Key="Str.Loading">Yükleniyor…</sys:String>
+  <sys:String x:Key="Str.Play">Oynat</sys:String>
+  <sys:String x:Key="Str.Stop">Durdur</sys:String>
+  <sys:String x:Key="Str.Previous">Önceki favori</sys:String>
+  <sys:String x:Key="Str.Next">Sonraki favori</sys:String>
+  <sys:String x:Key="Str.Mute">Sessize al</sys:String>
+  <sys:String x:Key="Str.Expand">Büyük pencereyi aç</sys:String>
+  <sys:String x:Key="Str.AlwaysOnTop">Her zaman üstte</sys:String>
+  <sys:String x:Key="Str.LockPosition">Konumu sabitle</sys:String>
+  <sys:String x:Key="Str.WidgetSize">Widget boyutu</sys:String>
+  <sys:String x:Key="Str.Hide">Gizle</sys:String>
+  <sys:String x:Key="Str.Exit">Çıkış</sys:String>
+  <sys:String x:Key="Str.Save">Kaydet</sys:String>
+  <sys:String x:Key="Str.Cancel">İptal</sys:String>
+  <sys:String x:Key="Str.ThirdPartyNotice">İstasyon verileri topluluk tarafından yönetilen Radio Browser kataloğundan gelir; yayın içerikleri üçüncü taraflara aittir.</sys:String>
+</ResourceDictionary>

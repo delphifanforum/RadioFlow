@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- 10.0.19041 hedefi: Windows SDK projeksiyonu (SystemMediaTransportControls, StartupTask) için gerekli. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <!-- Yalnızca sistem tepsisi simgesi (NotifyIcon) için. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- WPF + WinForms tür adı çakışmalarını önlemek için örtük using'ler kapalı. -->
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>RadioFlow.App</RootNamespace>
+    <AssemblyName>RadioFlow</AssemblyName>
+    <AssemblyTitle>RadioFlow — İnternet Radyosu</AssemblyTitle>
+    <Description>Windows 11 için modern internet radyosu widget'ı</Description>
+    <ApplicationIcon>Assets\radioflow.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <!-- LibVLC yalnızca x64 yerel dosyaları kopyalansın (VideoLAN.LibVLC.Windows MSBuild özellikleri). -->
+    <VlcWindowsX64Enabled>true</VlcWindowsX64Enabled>
+    <VlcWindowsX86Enabled>false</VlcWindowsX86Enabled>
+    <!-- LibVLC eklenti klasörü tek dosyaya gömülemez; tek dosya yayınlama kullanılmaz. -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <NoWarn>$(NoWarn);CA1001;CA1060;CA1515;CA1812;CA1859;CA2000;SYSLIB1054;CA5392</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RadioFlow.Core\RadioFlow.Core.csproj" />
+    <ProjectReference Include="..\RadioFlow.Infrastructure\RadioFlow.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\radioflow.ico" />
+    <Resource Include="Assets\radioflow.png" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,382 @@
+<Window x:Class="RadioFlow.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:RadioFlow.App.ViewModels"
+        xmlns:controls="clr-namespace:RadioFlow.App.Controls"
+        xmlns:models="clr-namespace:RadioFlow.Core.Models;assembly=RadioFlow.Core"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        x:Name="Self"
+        Title="RadioFlow"
+        Width="1050" Height="700" MinWidth="860" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource Font.Text}"
+        Foreground="{DynamicResource Brush.TextPrimary}"
+        UseLayoutRounding="True">
+
+  <Window.InputBindings>
+    <KeyBinding Key="Space" Modifiers="Control" Command="{Binding Player.PlayPauseCommand}" />
+    <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+  </Window.InputBindings>
+
+  <Window.Resources>
+    <!-- ===== İstasyon kartı ===== -->
+    <DataTemplate x:Key="StationCardTemplate" DataType="{x:Type vm:StationItemViewModel}">
+      <Border x:Name="Card" Width="232" Height="104" Margin="0,0,12,12" CornerRadius="{StaticResource Radius.Card}"
+              Background="{DynamicResource Brush.Card}" BorderThickness="1" BorderBrush="Transparent" Padding="12"
+              ToolTip="Çift tıklayarak oynatın" Cursor="Hand">
+        <Border.InputBindings>
+          <MouseBinding Gesture="LeftDoubleClick" Command="{Binding PlayCommand}" />
+        </Border.InputBindings>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <controls:StationLogo Width="48" Height="48" VerticalAlignment="Top"
+                                LogoPath="{Binding LogoPath}" Initial="{Binding Initial}" InitialFontSize="20" />
+
+          <StackPanel Grid.Column="1" Margin="10,0,0,0">
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+            <TextBlock Margin="0,3,0,0" Style="{StaticResource Text.Caption}">
+              <Run Text="{Binding Country, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Genre, Mode=OneWay}" />
+            </TextBlock>
+            <TextBlock Margin="0,2,0,0" Style="{StaticResource Text.Caption}" FontSize="11" Text="{Binding TechInfo}" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,-4,-4">
+            <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="12" Content="&#xE70E;" ToolTip="Yukarı taşı"
+                    Command="{Binding MoveUpCommand}" Visibility="{Binding CanReorder, Converter={StaticResource BoolToVisibility}}" />
+            <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="12" Content="&#xE70D;" ToolTip="Aşağı taşı"
+                    Command="{Binding MoveDownCommand}" Visibility="{Binding CanReorder, Converter={StaticResource BoolToVisibility}}" />
+            <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="12" Content="&#xE74D;" ToolTip="Özel istasyonu sil"
+                    Command="{Binding DeleteCommand}" Visibility="{Binding CanDelete, Converter={StaticResource BoolToVisibility}}" />
+            <Button Width="28" Height="28" FontSize="13" Content="{Binding FavoriteGlyph}" ToolTip="{Binding FavoriteToolTip}"
+                    Command="{Binding ToggleFavoriteCommand}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                      <Setter Property="Foreground" Value="{DynamicResource Brush.Favorite}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+            </Button>
+            <Button Style="{StaticResource PlayButton}" Width="30" Height="30" FontSize="11" Margin="4,0,0,0"
+                    Content="&#xE768;" ToolTip="Oynat" Command="{Binding PlayCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+      <DataTemplate.Triggers>
+        <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
+          <Setter TargetName="Card" Property="Background" Value="{DynamicResource Brush.CardHover}" />
+        </Trigger>
+        <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+          <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+          <Setter TargetName="Card" Property="Background" Value="{DynamicResource Brush.AccentSubtle}" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- ===== İstasyon listesi sayfası ===== -->
+    <DataTemplate DataType="{x:Type vm:StationListPageViewModel}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Margin="0,0,24,14">
+          <Button DockPanel.Dock="Left" Style="{StaticResource IconButton}" Margin="0,0,8,0" Content="&#xE72B;"
+                  ToolTip="{DynamicResource Str.Back}" Command="{Binding DataContext.GoBackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                  Visibility="{Binding DataContext.CanGoBack, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+          <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="{DynamicResource Str.Refresh}"
+                  Command="{Binding DataContext.RefreshCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+          <StackPanel>
+            <TextBlock Style="{StaticResource Text.PageTitle}" Text="{Binding Title}" />
+            <TextBlock Style="{StaticResource Text.Subtitle}" Text="{Binding Subtitle}" Margin="0,2,0,0" />
+          </StackPanel>
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,0,24,10">
+          <Border Background="{DynamicResource Brush.Surface}" CornerRadius="8" Padding="12,8"
+                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" Text="&#xE7BA;" FontSize="14"
+                         Foreground="{DynamicResource Brush.Warning}" Margin="0,0,10,0" />
+              <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}" />
+            </DockPanel>
+          </Border>
+          <TextBlock Text="{DynamicResource Str.Loading}" Style="{StaticResource Text.Subtitle}" Margin="0,6,0,0"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+          <TextBlock Text="{Binding Message}" Style="{StaticResource Text.Subtitle}" TextWrapping="Wrap" MaxWidth="460"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                     Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
+            <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource StationCardTemplate}" Margin="0,0,12,12">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Grid>
+    </DataTemplate>
+
+    <!-- ===== Ülke / tür sayfası ===== -->
+    <DataTemplate DataType="{x:Type vm:CategoryPageViewModel}">
+      <Grid Margin="0,0,24,0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Margin="0,0,0,14">
+          <TextBlock Style="{StaticResource Text.PageTitle}" Text="{Binding Title}" />
+          <TextBlock Style="{StaticResource Text.Subtitle}" Text="{Binding Subtitle}" Margin="0,2,0,0" />
+        </StackPanel>
+        <DockPanel Grid.Row="1" Margin="0,0,0,12">
+          <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" Content="Tekrar dene"
+                  Command="{Binding RetryCommand}" Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+          <TextBox Style="{StaticResource InputBox}" Tag="Listede filtrele…" MaxWidth="360" HorizontalAlignment="Left" MinWidth="280"
+                   Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" />
+        </DockPanel>
+        <Grid Grid.Row="2">
+          <TextBlock Text="{DynamicResource Str.Loading}" Style="{StaticResource Text.Subtitle}"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+          <TextBlock Text="{Binding Message}" Style="{StaticResource Text.Subtitle}" TextWrapping="Wrap"
+                     Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+          <ListBox Style="{StaticResource BareListBox}" ItemsSource="{Binding Items}"
+                   ItemContainerStyle="{StaticResource CategoryListItem}"
+                   VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                   ScrollViewer.CanContentScroll="True">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+              <DataTemplate DataType="{x:Type models:CatalogCategory}">
+                <DockPanel Background="Transparent">
+                  <DockPanel.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                  CommandParameter="{Binding}" />
+                  </DockPanel.InputBindings>
+                  <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Caption}" VerticalAlignment="Center">
+                    <Run Text="{Binding StationCount, Mode=OneWay, StringFormat={}{0:N0}}" /><Run Text=" istasyon" />
+                  </TextBlock>
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="14" Margin="0,0,12,0"
+                             Foreground="{DynamicResource Brush.TextTertiary}"
+                             Text="{Binding DataContext.Glyph, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                  <TextBlock Text="{Binding DisplayName}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Grid>
+    </DataTemplate>
+  </Window.Resources>
+
+  <Grid x:Name="Root">
+    <Border x:Name="TintLayer" Background="{DynamicResource Brush.WindowTint}" />
+
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="48" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <!-- ================= Başlık çubuğu (sürüklenebilir) ================= -->
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="220" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
+          <Image Source="pack://application:,,,/RadioFlow;component/Assets/radioflow.png" Width="20" Height="20"
+                 RenderOptions.BitmapScalingMode="HighQuality" />
+          <TextBlock Text="RadioFlow" Margin="10,0,0,0" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <DockPanel Grid.Column="1" Margin="8,8,16,8" HorizontalAlignment="Left" Width="440">
+          <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" Padding="12,5" MinWidth="0"
+                  Command="{Binding OpenAddStationCommand}" ToolTip="Kendi yayın adresinizi ekleyin">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE710;" FontSize="12" Margin="0,0,6,0" />
+              <TextBlock Text="{DynamicResource Str.AddStation}" />
+            </StackPanel>
+          </Button>
+          <Grid>
+            <TextBox x:Name="SearchBox" Style="{StaticResource InputBox}" Tag="{DynamicResource Str.Search}" Padding="32,5,10,5"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Radyo ara">
+              <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
+              </TextBox.InputBindings>
+            </TextBox>
+            <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE721;" FontSize="13" HorizontalAlignment="Left" Margin="11,0,0,0"
+                       Foreground="{DynamicResource Brush.TextTertiary}" IsHitTestVisible="False" />
+          </Grid>
+        </DockPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+          <Button Style="{StaticResource IconButton}" Width="46" Height="36" FontSize="12" Content="&#xE73F;"
+                  ToolTip="Mini widget'a geç" Click="OnSwitchToWidgetClick" />
+          <Button Style="{StaticResource IconButton}" Width="46" Height="36" FontSize="10" Content="&#xE921;"
+                  ToolTip="Simge durumuna küçült" Click="OnMinimizeClick" />
+          <Button x:Name="MaximizeButton" Style="{StaticResource IconButton}" Width="46" Height="36" FontSize="10" Content="&#xE922;"
+                  ToolTip="Ekranı kapla" Click="OnMaximizeClick" />
+          <Button Style="{StaticResource CloseButton}" Width="46" Height="36" FontSize="10" Content="&#xE8BB;"
+                  ToolTip="Kapat (yayın devam eder)" Click="OnCloseClick" />
+        </StackPanel>
+      </Grid>
+
+      <!-- ================= Gövde: sol menü + sayfa ================= -->
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="220" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Margin="10,6,10,12">
+          <StackPanel DockPanel.Dock="Bottom">
+            <Button Style="{StaticResource NavButton}" Command="{Binding OpenSettingsCommand}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE713;" FontSize="15" Margin="0,0,14,0" />
+                <TextBlock Text="{DynamicResource Str.Settings}" FontSize="13" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+          <ListBox Style="{StaticResource BareListBox}" ItemsSource="{Binding NavItems}" SelectedItem="{Binding SelectedNav}"
+                   ItemContainerStyle="{StaticResource NavListItem}" AutomationProperties.Name="Gezinti menüsü">
+            <ListBox.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:NavItem}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource Text.Icon}" Text="{Binding Glyph}" FontSize="15" Margin="0,0,14,0" />
+                  <TextBlock Text="{Binding Title}" FontSize="13" VerticalAlignment="Center" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+
+        <Border Grid.Column="1" Background="{DynamicResource Brush.Pane}" CornerRadius="10,0,0,0"
+                BorderBrush="{DynamicResource Brush.SurfaceStroke}" BorderThickness="1,1,0,0">
+          <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}" Margin="24,20,0,0" Focusable="False">
+            <ContentControl.RenderTransform>
+              <TranslateTransform />
+            </ContentControl.RenderTransform>
+          </ContentControl>
+        </Border>
+      </Grid>
+
+      <!-- ================= Now Playing çubuğu ================= -->
+      <Border Grid.Row="2" BorderBrush="{DynamicResource Brush.SurfaceStroke}" BorderThickness="0,1,0,0" Padding="16,10"
+              DataContext="{Binding Player}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <DockPanel>
+            <controls:StationLogo DockPanel.Dock="Left" Width="52" Height="52"
+                                  LogoPath="{Binding LogoPath}" Initial="{Binding StationInitial}" InitialFontSize="22" />
+            <StackPanel Margin="12,0,12,0" VerticalAlignment="Center">
+              <TextBlock Text="{Binding StationName}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" />
+              <TextBlock Text="{Binding SecondaryText}" FontSize="12" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"
+                         ToolTip="{Binding SecondaryText}">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.TextSecondary}" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsError}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Warning}" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </StackPanel>
+          </DockPanel>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Style="{StaticResource IconButton}" Width="36" Height="36" Content="&#xE71A;" ToolTip="{DynamicResource Str.Stop}" Command="{Binding StopCommand}" />
+            <Button Style="{StaticResource IconButton}" Width="36" Height="36" Content="&#xE892;" ToolTip="{DynamicResource Str.Previous}" Command="{Binding PreviousCommand}" />
+            <Button Style="{StaticResource PlayButton}" Width="44" Height="44" Margin="8,0" Content="{Binding PlayPauseGlyph}"
+                    ToolTip="{Binding PlayPauseToolTip}" Command="{Binding PlayPauseCommand}" />
+            <Button Style="{StaticResource IconButton}" Width="36" Height="36" Content="&#xE893;" ToolTip="{DynamicResource Str.Next}" Command="{Binding NextCommand}" />
+            <Button Width="36" Height="36" Content="{Binding FavoriteGlyph}" ToolTip="Favorilere ekle / çıkar" Command="{Binding ToggleFavoriteCommand}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                      <Setter Property="Foreground" Value="{DynamicResource Brush.Favorite}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+            </Button>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Button Style="{StaticResource IconButton}" Content="{Binding VolumeGlyph}" ToolTip="{DynamicResource Str.Mute}" Command="{Binding ToggleMuteCommand}" />
+            <Slider Style="{StaticResource ModernSlider}" Width="130" Margin="4,0,8,0" Value="{Binding Volume, Mode=TwoWay}"
+                    AutomationProperties.Name="Ses seviyesi" />
+            <TextBlock Style="{StaticResource Text.Caption}" Width="28" VerticalAlignment="Center" Text="{Binding Volume}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- ================= İstasyon ekleme katmanı ================= -->
+    <Grid Background="{DynamicResource Brush.Overlay}"
+          Visibility="{Binding IsAddStationOpen, Converter={StaticResource BoolToVisibility}}">
+      <Border Width="460" Background="{DynamicResource Brush.Popup}" CornerRadius="12" Padding="24"
+              BorderBrush="{DynamicResource Brush.SurfaceStroke}" BorderThickness="1"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border.Effect>
+          <DropShadowEffect BlurRadius="30" ShadowDepth="6" Opacity="0.35" Color="Black" />
+        </Border.Effect>
+        <StackPanel>
+          <TextBlock Text="İstasyon Ekle" FontSize="20" FontWeight="SemiBold" />
+          <TextBlock Style="{StaticResource Text.Subtitle}" TextWrapping="Wrap" Margin="0,4,0,16"
+                     Text="Yalnızca http:// veya https:// yayın adresleri kabul edilir. M3U ve PLS çalma listeleri desteklenir." />
+          <TextBlock Text="İstasyon adı" Style="{StaticResource Text.Caption}" Margin="0,0,0,4" />
+          <TextBox Style="{StaticResource InputBox}" Tag="Ör. Ev Radyom" Text="{Binding NewStationName, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="Yayın adresi (URL)" Style="{StaticResource Text.Caption}" Margin="0,12,0,4" />
+          <TextBox Style="{StaticResource InputBox}" Tag="https://ornek.com/stream.mp3" Text="{Binding NewStationUrl, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="Logo adresi (isteğe bağlı)" Style="{StaticResource Text.Caption}" Margin="0,12,0,4" />
+          <TextBox Style="{StaticResource InputBox}" Tag="https://ornek.com/logo.png" Text="{Binding NewStationLogo, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="Türler (virgülle ayırın, isteğe bağlı)" Style="{StaticResource Text.Caption}" Margin="0,12,0,4" />
+          <TextBox Style="{StaticResource InputBox}" Tag="pop, türkçe" Text="{Binding NewStationTags, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="{Binding AddStationError}" Foreground="{DynamicResource Brush.Danger}" TextWrapping="Wrap" Margin="0,12,0,0"
+                     Visibility="{Binding HasAddStationError, Converter={StaticResource BoolToVisibility}}" />
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource Str.Cancel}" Command="{Binding CancelAddStationCommand}" />
+            <Button Style="{StaticResource PrimaryButton}" Content="Kaydet ve Oynat" Margin="8,0,0,0" Command="{Binding SaveCustomStationCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

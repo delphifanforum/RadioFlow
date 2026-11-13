@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- xUnit v3 test projeleri kendi başına çalışabilen bir uygulamadır (Microsoft Testing Platform). -->
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>RadioFlow.Tests</RootNamespace>
+    <NoWarn>$(NoWarn);CA1707;CA1515;CA2234;CA1861;CA2000;CA1849</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RadioFlow.Core\RadioFlow.Core.csproj" />
+    <ProjectReference Include="..\..\src\RadioFlow.Infrastructure\RadioFlow.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

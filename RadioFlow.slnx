@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RadioFlow.App/RadioFlow.App.csproj" />
+    <Project Path="src/RadioFlow.Core/RadioFlow.Core.csproj" />
+    <Project Path="src/RadioFlow.Infrastructure/RadioFlow.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RadioFlow.Tests/RadioFlow.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+    <File Path="ROADMAP.md" />
+    <File Path="CHANGELOG.md" />
+  </Folder>
+</Solution>
