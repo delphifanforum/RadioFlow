@@ -55,7 +55,7 @@
                 <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Caption}" Text="{Binding WidgetOpacity, Converter={StaticResource Percent}}" />
                 <TextBlock Text="Widget arka plan yoğunluğu" />
               </DockPanel>
-              <Slider Style="{StaticResource ModernSlider}" Minimum="0.3" Maximum="1" SmallChange="0.05" LargeChange="0.1"
+              <Slider Style="{StaticResource ModernSlider}" Minimum="0.5" Maximum="1" SmallChange="0.05" LargeChange="0.1"
                       Value="{Binding WidgetOpacity}" Margin="0,6,0,0" AutomationProperties.Name="Widget şeffaflığı" />
               <TextBlock Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
                          Text="Düşük değer, Windows 11 akrilik efektini daha görünür yapar. Efekt desteklenmeyen sistemlerde düz renk kullanılır." />
@@ -70,6 +70,13 @@
           </Border>
           <Border Style="{StaticResource SettingRow}">
             <CheckBox Style="{StaticResource ToggleSwitch}" Content="Widget her zaman üstte" IsChecked="{Binding AlwaysOnTop}" />
+          </Border>
+          <Border Style="{StaticResource SettingRow}">
+            <StackPanel>
+              <CheckBox Style="{StaticResource ToggleSwitch}" Content="Kontrolleri otomatik gizle" IsChecked="{Binding AutoHideWidgetControls}" />
+              <TextBlock Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
+                         Text="Açıkken widget üzerinde yalnızca logo, isim ve oynat/duraklat görünür; önceki/sonraki, durdur, favori, ses ve genişlet düğmeleri yalnızca fare widget üzerindeyken belirir." />
+            </StackPanel>
           </Border>
           <Border Style="{StaticResource SettingRow}">
             <StackPanel>

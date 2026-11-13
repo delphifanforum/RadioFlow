@@ -35,6 +35,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _language = "tr-TR";
     [ObservableProperty] private int _maxReconnectAttempts;
     [ObservableProperty] private int _initialReconnectDelaySeconds;
+    [ObservableProperty] private bool _autoHideWidgetControls;
     [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _showNotifications;
     [ObservableProperty] private bool _notifyOnSongChange;
@@ -71,7 +72,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [
         new(WidgetSize.Compact, "Kompakt"),
         new(WidgetSize.Normal, "Normal"),
-        new(WidgetSize.Large, "Büyük"),
+        new(WidgetSize.Large, "Genişletilmiş"),
     ];
 
     /// <summary>Dil altyapısı: şu an yalnızca Türkçe kaynak sözlüğü bulunur.</summary>
@@ -100,6 +101,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         AutoPlayLastStation = s.AutoPlayLastStation;
         DefaultVolume = s.DefaultVolume;
         WidgetSize = s.WidgetSize;
+        AutoHideWidgetControls = s.AutoHideWidgetControls;
         MainWidth = s.MainWidth;
         MainHeight = s.MainHeight;
         Language = s.Language;
@@ -151,6 +153,7 @@ public sealed partial class SettingsViewModel : ObservableObject
                 s.AutoPlayLastStation = AutoPlayLastStation;
                 s.DefaultVolume = DefaultVolume;
                 s.WidgetSize = WidgetSize;
+                s.AutoHideWidgetControls = AutoHideWidgetControls;
                 s.MainWidth = MainWidth;
                 s.MainHeight = MainHeight;
                 s.Language = Language;

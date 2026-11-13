@@ -97,5 +97,35 @@ public sealed class SettingsTests
         Assert.Equal(AppTheme.Dark, loaded.Theme);
         Assert.True(loaded.ShowWidgetOnStartup);
         Assert.False(loaded.RunAtStartup); // Başlangıçta çalıştırma varsayılan olarak kapalı.
+        Assert.False(loaded.AutoHideWidgetControls); // RadioFlow 2.0: varsayılan olarak kapalı.
+    }
+
+    // RadioFlow 2.0: "Kontrolleri otomatik gizle" ayarı kaydedilip yeniden yüklenebilmeli.
+    [Fact]
+    public async Task Update_PersistsAutoHideWidgetControls_AcrossReload()
+    {
+        await using var db = await TestDatabase.CreateAsync();
+        var ct = TestContext.Current.CancellationToken;
+        var first = Create(db);
+        await first.LoadAsync(ct);
+        await first.UpdateAsync(s => s.AutoHideWidgetControls = true, ct);
+
+        var second = Create(db);
+        var loaded = await second.LoadAsync(ct);
+
+        Assert.True(loaded.AutoHideWidgetControls);
+    }
+
+    // RadioFlow 2.0: widget opaklığı artık %50-%100 aralığına sıkıştırılır.
+    [Fact]
+    public void Normalize_ClampsWidgetOpacity_ToFiftyToHundredPercent()
+    {
+        var tooLow = new RadioFlow.Core.Models.AppSettings { WidgetOpacity = 0.1 };
+        tooLow.Normalize();
+        Assert.Equal(0.5, tooLow.WidgetOpacity, 3);
+
+        var tooHigh = new RadioFlow.Core.Models.AppSettings { WidgetOpacity = 1.5 };
+        tooHigh.Normalize();
+        Assert.Equal(1.0, tooHigh.WidgetOpacity, 3);
     }
 }

@@ -6,6 +6,25 @@
 - ⬜ **Bekliyor**
 
 > Doğrulama ortamı: bulut Linux sandbox. NuGet erişimi yoktu ve WPF derlenemedi. Ayrıntılar [docs/VERIFICATION.md](docs/VERIFICATION.md) içinde.
+>
+> **Güncelleme (2.0, 2026-11-13):** `E:\RadioFlow\artifacts\publish\win-x64\RadioFlow.exe` dosyasının varlığı,
+> 0.1.0 sürümünün kullanıcının kendi Windows 11 makinesinde gerçek derleyiciyle (`build.ps1`) **başarıyla
+> derlendiğini ve yayınlandığını** doğrular — bu aşağıdaki 🟡 işaretlerinin çoğunu "derlendi" anlamında
+> geride bırakır. Ancak bu yalnızca derleme/yayın başarısını kanıtlar; uygulamanın fiilen açılıp açılmadığı,
+> sesin gerçekten çaldığı, widget'ın sürüklenip boyut değiştirdiği gibi **çalışma zamanı davranışları bana
+> hâlâ bildirilmedi**. Aşağıdaki tablo bu ayrımı korur: "🟡 derlendi" ile "✅ test edildi" karıştırılmamalıdır.
+
+## RadioFlow 2.0 — Premium widget güncellemesi (bu teslimat)
+
+| Özellik | Durum |
+|---|---|
+| Compact / Normal / Genişletilmiş görünüm modları (farklı içerik, sağ tık menüsü, kalıcı) | 🟡 Kod yazıldı, Roslyn/XML ile doğrulandı. WPF derleyicisinden geçmedi |
+| Otomatik gizlenen ikincil kontroller (ayar + hover animasyonu, klavye erişimi korunur) | 🟡 |
+| Animasyonlu canlı yayın göstergesi (`LiveIndicator`: oynatma/bağlanma/duraklatma/hata) | 🟡 |
+| Favori hızlı değiştirme paneli (istasyon adına tıkla → popup) | 🟡 |
+| Ayarlar: "Kontrolleri otomatik gizle", opaklık aralığı %50–%100 | ✅ ayar kalıcılığı (2 yeni test, 76/76 geçti) · 🟡 UI |
+| Ses görselleştirici (gerçek PCM seviyesine dayalı) | ⬜ **Bilinçli olarak ertelendi** — bkz. CHANGELOG.md. LibVLC'nin ses çıkışını `SetAudioCallbacks` ile değiştirmek gerekirdi; bu ortamda gerçek ses donanımıyla test edilemediği ve çalışan sesi bozma riski taşıdığı için eklenmedi. Sahte/rastgele çubuk da eklenmedi |
+| Sistem tepsisi oynat/duraklat/önceki/sonraki, favori sıralama, son dinlenenler, çoklu monitör/DPI, temiz kapatma | ✅ (0.1.0'dan beri mevcuttu; bu sürümde dokunulmadı, regresyon yok — 76/76 test hâlâ geçiyor) |
 
 ## Faz 1 — Çalışan MVP
 

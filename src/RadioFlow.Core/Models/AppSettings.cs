@@ -22,6 +22,9 @@ public sealed class AppSettings
     public string Language { get; set; } = "tr-TR";
     public int MaxReconnectAttempts { get; set; } = 5;
     public int InitialReconnectDelaySeconds { get; set; } = 2;
+    /// <summary>Widget üzerinde fare yokken ikincil kontrolleri (önceki/sonraki, durdur, favori, ses, genişlet) gizler.</summary>
+    public bool AutoHideWidgetControls { get; set; }
+
     public bool MinimizeToTray { get; set; } = true;
     public bool ShowNotifications { get; set; } = true;
     public bool NotifyOnSongChange { get; set; }
@@ -41,7 +44,7 @@ public sealed class AppSettings
     /// <summary>Değerleri geçerli aralıklara sıkıştırır (bozuk/elle düzenlenmiş veriye karşı).</summary>
     public void Normalize()
     {
-        WidgetOpacity = Math.Clamp(WidgetOpacity, 0.3, 1.0);
+        WidgetOpacity = Math.Clamp(WidgetOpacity, 0.5, 1.0);
         DefaultVolume = Math.Clamp(DefaultVolume, 0, 100);
         LastVolume = Math.Clamp(LastVolume, 0, 100);
         MaxReconnectAttempts = Math.Clamp(MaxReconnectAttempts, 0, 20);

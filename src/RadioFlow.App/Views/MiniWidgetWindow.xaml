@@ -20,7 +20,8 @@
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
 
-  <Grid x:Name="Root" Background="Transparent">
+  <Grid x:Name="Root" Background="Transparent"
+        MouseEnter="OnRootMouseEnter" MouseLeave="OnRootMouseLeave">
     <Grid.ContextMenu>
       <ContextMenu>
         <MenuItem Header="Büyük pencereyi aç" Tag="&#xE740;" Command="{Binding ExpandCommand}" />
@@ -34,9 +35,10 @@
         <Separator />
         <MenuItem Header="Her zaman üstte" Tag="&#xE718;" IsChecked="{Binding IsAlwaysOnTop, Mode=OneWay}" Command="{Binding ToggleAlwaysOnTopCommand}" />
         <MenuItem Header="Konumu sabitle" Tag="&#xE72E;" IsChecked="{Binding IsLocked, Mode=OneWay}" Command="{Binding ToggleLockCommand}" />
+        <MenuItem Header="Kontrolleri otomatik gizle" Tag="&#xE890;" IsChecked="{Binding AutoHideControls, Mode=OneWay}" Command="{Binding ToggleAutoHideCommand}" />
         <MenuItem Header="Boyut: Kompakt" Tag="&#xE73F;" Command="{Binding SetSizeCommand}" CommandParameter="{x:Static enums:WidgetSize.Compact}" />
         <MenuItem Header="Boyut: Normal" Tag="&#xE740;" Command="{Binding SetSizeCommand}" CommandParameter="{x:Static enums:WidgetSize.Normal}" />
-        <MenuItem Header="Boyut: Büyük" Tag="&#xE1D9;" Command="{Binding SetSizeCommand}" CommandParameter="{x:Static enums:WidgetSize.Large}" />
+        <MenuItem Header="Boyut: Genişletilmiş" Tag="&#xE1D9;" Command="{Binding SetSizeCommand}" CommandParameter="{x:Static enums:WidgetSize.Large}" />
         <Separator />
         <MenuItem Header="Ayarlar" Tag="&#xE713;" Command="{Binding OpenSettingsCommand}" />
         <MenuItem Header="Gizle" Tag="&#xE921;" Command="{Binding CloseCommand}" />
@@ -44,11 +46,41 @@
       </ContextMenu>
     </Grid.ContextMenu>
 
-    <!-- Cam katmanı: Acrylic üzerinde renk tonu; opaklık "Widget şeffaflığı" ayarından gelir. -->
+    <!-- Cam katmanı: Acrylic/Mica üzerinde renk tonu; opaklık "Widget şeffaflığı" ayarından gelir.
+         Yalnızca bu katmanın alfa'sı değişir; pencerenin kendisi WS_EX_TRANSPARENT ile işaretlenmediği
+         için düşük opaklıkta bile tüm yüzey tıklanabilir kalır. -->
     <Border x:Name="TintLayer" Background="{DynamicResource Brush.WindowTint}" Opacity="{Binding TintOpacity}" />
     <Border BorderBrush="{DynamicResource Brush.SurfaceStroke}" BorderThickness="1" />
 
-    <Grid Margin="12,10,10,10">
+    <!-- ===================== Kompakt mod: yalnızca logo, ad, canlı gösterge ve play/pause. ===================== -->
+    <Grid Margin="10" Visibility="{Binding IsCompact, Converter={StaticResource BoolToVisibility}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <controls:StationLogo Width="{Binding LogoSize}" Height="{Binding LogoSize}" VerticalAlignment="Center"
+                            LogoPath="{Binding Player.LogoPath}" Initial="{Binding Player.StationInitial}" InitialFontSize="18" />
+
+      <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+        <Button Style="{StaticResource LinkButton}" Command="{Binding ToggleStationPickerCommand}"
+                ToolTip="İstasyonu değiştirmek için tıklayın" AutomationProperties.Name="İstasyon seçimini aç">
+          <TextBlock Text="{Binding Player.StationName}" FontSize="{Binding TitleFontSize}" FontWeight="SemiBold"
+                     TextTrimming="CharacterEllipsis" />
+        </Button>
+        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+          <controls:LiveIndicator State="{Binding Player.State}" Margin="0,0,5,0" />
+          <TextBlock Style="{StaticResource Text.Caption}" FontSize="10" Text="{Binding Player.StatusText}" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+      </StackPanel>
+
+      <Button Grid.Column="2" Style="{StaticResource PlayButton}" Width="32" Height="32" FontSize="12"
+              Content="{Binding Player.PlayPauseGlyph}" ToolTip="{Binding Player.PlayPauseToolTip}" Command="{Binding Player.PlayPauseCommand}" />
+    </Grid>
+
+    <!-- ===================== Normal / Genişletilmiş mod ===================== -->
+    <Grid Margin="12,10,10,10" Visibility="{Binding IsCompact, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
       <Grid.RowDefinitions>
         <RowDefinition Height="*" />
         <RowDefinition Height="Auto" />
@@ -63,10 +95,13 @@
       <controls:StationLogo Width="{Binding LogoSize}" Height="{Binding LogoSize}" VerticalAlignment="Top"
                             LogoPath="{Binding Player.LogoPath}" Initial="{Binding Player.StationInitial}" InitialFontSize="24" />
 
-      <!-- İstasyon ve şarkı bilgisi -->
+      <!-- İstasyon ve şarkı bilgisi (ada tıklayınca favori hızlı seçim paneli açılır) -->
       <StackPanel Grid.Column="1" Margin="12,2,6,0" VerticalAlignment="Top">
-        <TextBlock Text="{Binding Player.StationName}" FontSize="{Binding TitleFontSize}" FontWeight="SemiBold"
-                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Player.StationName}" />
+        <Button Style="{StaticResource LinkButton}" Command="{Binding ToggleStationPickerCommand}"
+                ToolTip="İstasyonu değiştirmek için tıklayın" AutomationProperties.Name="İstasyon seçimini aç">
+          <TextBlock Text="{Binding Player.StationName}" FontSize="{Binding TitleFontSize}" FontWeight="SemiBold"
+                     TextTrimming="CharacterEllipsis" />
+        </Button>
         <TextBlock x:Name="SecondaryLine" Text="{Binding Player.SecondaryText}" Margin="0,3,0,0" FontSize="12"
                    TextTrimming="CharacterEllipsis" ToolTip="{Binding Player.SecondaryText}">
           <TextBlock.Style>
@@ -80,50 +115,40 @@
             </Style>
           </TextBlock.Style>
         </TextBlock>
-        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-          <Ellipse Width="6" Height="6" Fill="{DynamicResource Brush.Accent}" VerticalAlignment="Center" Margin="0,0,6,0"
-                   Visibility="{Binding Player.IsActive, Converter={StaticResource BoolToVisibility}}" />
+        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+          <controls:LiveIndicator State="{Binding Player.State}" Margin="0,0,6,0" />
           <TextBlock Style="{StaticResource Text.Caption}" FontSize="11"
                      Text="{Binding Player.StatusText}"
                      Visibility="{Binding Player.HasNowPlaying, Converter={StaticResource BoolToVisibility}}" />
         </StackPanel>
       </StackPanel>
 
-      <!-- Üst sağ: sabitle / genişlet / kapat -->
+      <!-- Üst sağ: sabitle / genişlet / kapat. Genişlet (büyük pencere) oto-gizle grubundadır. -->
       <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,-4,-4,0">
         <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="12"
                 Content="{Binding LockGlyph}" ToolTip="{Binding LockToolTip}" Command="{Binding ToggleLockCommand}" />
-        <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="12"
+        <Button Style="{StaticResource AutoHideButton}" Width="28" Height="28" FontSize="12"
                 Content="&#xE740;" ToolTip="{DynamicResource Str.Expand}" Command="{Binding ExpandCommand}" />
         <Button Style="{StaticResource IconButton}" Width="28" Height="28" FontSize="11"
                 Content="&#xE8BB;" ToolTip="{DynamicResource Str.Hide}" Command="{Binding CloseCommand}" />
       </StackPanel>
 
-      <!-- Alt: oynatma kontrolleri ve ses -->
+      <!-- Alt: oynatma kontrolleri ve ses. Play/Pause her zaman görünür; diğerleri oto-gizle grubunda. -->
       <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,8,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-          <Button Style="{StaticResource IconButton}" Content="&#xE892;" ToolTip="{DynamicResource Str.Previous}" Command="{Binding Player.PreviousCommand}" />
+          <Button Style="{StaticResource AutoHideButton}" Content="&#xE892;" ToolTip="{DynamicResource Str.Previous}" Command="{Binding Player.PreviousCommand}" />
           <Button Style="{StaticResource PlayButton}" Width="36" Height="36" Margin="4,0" FontSize="14"
                   Content="{Binding Player.PlayPauseGlyph}" ToolTip="{Binding Player.PlayPauseToolTip}" Command="{Binding Player.PlayPauseCommand}" />
-          <Button Style="{StaticResource IconButton}" Content="&#xE893;" ToolTip="{DynamicResource Str.Next}" Command="{Binding Player.NextCommand}" />
-          <Button Style="{StaticResource IconButton}" Content="&#xE71A;" ToolTip="{DynamicResource Str.Stop}" Command="{Binding Player.StopCommand}" />
-          <Button Content="{Binding Player.FavoriteGlyph}" ToolTip="Favorilere ekle / çıkar" Command="{Binding Player.ToggleFavoriteCommand}">
-            <Button.Style>
-              <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding Player.IsFavorite}" Value="True">
-                    <Setter Property="Foreground" Value="{DynamicResource Brush.Favorite}" />
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </Button.Style>
-          </Button>
+          <Button Style="{StaticResource AutoHideButton}" Content="&#xE893;" ToolTip="{DynamicResource Str.Next}" Command="{Binding Player.NextCommand}" />
+          <Button Style="{StaticResource AutoHideButton}" Content="&#xE71A;" ToolTip="{DynamicResource Str.Stop}" Command="{Binding Player.StopCommand}" />
+          <Button Style="{StaticResource FavoriteAutoHideButton}" Content="{Binding Player.FavoriteGlyph}"
+                  ToolTip="Favorilere ekle / çıkar" Command="{Binding Player.ToggleFavoriteCommand}" />
         </StackPanel>
-        <DockPanel Grid.Column="1" Margin="6,0,2,0" VerticalAlignment="Center">
+        <DockPanel Grid.Column="1" Margin="6,0,2,0" VerticalAlignment="Center" Style="{StaticResource AutoHideFade}">
           <Button DockPanel.Dock="Left" Style="{StaticResource IconButton}" Width="28" Content="{Binding Player.VolumeGlyph}"
                   ToolTip="{DynamicResource Str.Mute}" Command="{Binding Player.ToggleMuteCommand}" />
           <Slider Style="{StaticResource ModernSlider}" Margin="2,0,0,0" Value="{Binding Player.Volume, Mode=TwoWay}"
@@ -131,5 +156,45 @@
         </DockPanel>
       </Grid>
     </Grid>
+
+    <!-- ===================== Favori hızlı değiştirme paneli =====================
+         Popup, mantıksal ağaçta Root'un çocuğu olsa da DataContext'i otomatik miras almaz;
+         bu yüzden PlacementTarget üzerinden açıkça bağlanır. İçindeki komutlar bu sayede
+         doğrudan {Binding PickStationCommand} ile WidgetViewModel'e ulaşır. -->
+    <Popup x:Name="StationPickerPopup" IsOpen="{Binding IsStationPickerOpen, Mode=TwoWay}"
+           PlacementTarget="{Binding ElementName=Root}"
+           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
+           Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+      <Border Background="{DynamicResource Brush.Popup}" CornerRadius="10" Padding="4"
+              BorderBrush="{DynamicResource Brush.SurfaceStroke}" BorderThickness="1" MaxHeight="260" MinWidth="220">
+        <Border.Effect>
+          <DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.3" Color="Black" />
+        </Border.Effect>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="252">
+          <ItemsControl ItemsSource="{Binding FavoriteStations}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Command="{Binding DataContext.PickStationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}">
+                  <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                      <Setter Property="HorizontalAlignment" Value="Stretch" />
+                      <Setter Property="HorizontalContentAlignment" Value="Left" />
+                      <Setter Property="Padding" Value="6,6" />
+                    </Style>
+                  </Button.Style>
+                  <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+    </Popup>
   </Grid>
 </Window>

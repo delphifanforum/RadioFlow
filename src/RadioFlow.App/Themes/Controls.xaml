@@ -685,4 +685,90 @@
       </DoubleAnimation.EasingFunction>
     </DoubleAnimation>
   </Storyboard>
+
+  <!-- ============ Mini widget: oto-gizlenen ikincil kontroller ============
+       "ShowSecondaryControls" (WidgetViewModel) false olduğunda yumuşakça solup gider ve
+       tıklanamaz hale gelir; true olduğunda geri belirir. Varsayılan (oto-gizle kapalı) her
+       zaman görünür kalır. İki biçimi vardır: düğme olmayan öğeler için genel sürüm, ve
+       IconButton görünümünü koruyan düğme sürümü. -->
+  <Style x:Key="AutoHideFade" TargetType="FrameworkElement">
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="IsHitTestVisible" Value="True" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding ShowSecondaryControls}" Value="False">
+        <DataTrigger.EnterActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.18" />
+            </Storyboard>
+          </BeginStoryboard>
+        </DataTrigger.EnterActions>
+        <DataTrigger.ExitActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
+            </Storyboard>
+          </BeginStoryboard>
+        </DataTrigger.ExitActions>
+        <Setter Property="IsHitTestVisible" Value="False" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style x:Key="AutoHideButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding ShowSecondaryControls}" Value="False">
+        <DataTrigger.EnterActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.18" />
+            </Storyboard>
+          </BeginStoryboard>
+        </DataTrigger.EnterActions>
+        <DataTrigger.ExitActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
+            </Storyboard>
+          </BeginStoryboard>
+        </DataTrigger.ExitActions>
+        <Setter Property="IsHitTestVisible" Value="False" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Favoriler düğmesi: hem oto-gizle davranışını hem de favori renk vurgusunu taşır. -->
+  <Style x:Key="FavoriteAutoHideButton" TargetType="Button" BasedOn="{StaticResource AutoHideButton}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Player.IsFavorite}" Value="True">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Favorite}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Metin gibi görünen, Button davranışını koruyan tıklanabilir alan (ör. widget'ta istasyon adı).
+       Button olduğu için MouseLeftButtonDown'ı kendi işler; pencere sürüklemesiyle çakışmaz. -->
+  <Style x:Key="LinkButton" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Bd" Background="{TemplateBinding Background}">
+            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Opacity" Value="0.8" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 </ResourceDictionary>

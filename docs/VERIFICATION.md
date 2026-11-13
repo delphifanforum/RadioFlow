@@ -1,6 +1,27 @@
-# Doğrulama Raporu (v0.1.0)
+# Doğrulama Raporu (v0.1.0, v0.2.0 eki ile)
 
 Bu belge **neyin nasıl doğrulandığını** ve **neyin doğrulanmadığını** açıkça kayda geçirir.
+
+## v0.2.0 eki — "RadioFlow 2.0" (bu teslimat)
+
+- Değişen/eklenen tüm `.cs` dosyaları Roslyn ile sözdizimi açısından tarandı: **0 hata**.
+- Değişen/eklenen tüm `.xaml` dosyaları XML iyi-biçimliliği açısından ayrıştırıldı: **0 hata**. Bu, yalnızca
+  belgenin geçerli XML olduğunu kanıtlar; XAML'a özgü anlamsal hataları (yanlış özellik adı, eksik
+  `TargetType`, vb.) yakalamaz — bunlar yalnızca gerçek WPF/XAML derleyicisiyle kesinleşir.
+- `RadioFlow.Core` ve `RadioFlow.Infrastructure`, güncellenmiş `AppSettings.cs` dahil, gerçek kaynaklarla
+  yeniden derlendi: **0 hata**.
+- Tüm test paketi yeniden çalıştırıldı: **76/76 geçti** (74 mevcut + 2 yeni: oto-gizle ayarının kalıcılığı,
+  opaklık aralığının %50–%100'e sıkıştırılması).
+- Kullanıcının kendi makinesinde `E:\RadioFlow\artifacts\publish\win-x64\RadioFlow.exe` dosyasının mevcut
+  olması, **v0.1.0'ın gerçek derleyiciyle başarıyla derlendiğini ve yayınlandığını** doğrular — bu, önceki
+  "WPF Linux'ta derlenemedi" kısıtının artık yalnızca bu oturum (bu teslimat) için geçerli olduğu anlamına
+  gelir; yeni/değişen WPF kodu (mini widget, yeni kontroller, ayarlar ekranı) henüz gerçek derleyiciden
+  geçmedi. Kullanıcının `.\build.ps1` çalıştırması bunu kesinleştirecektir.
+- **Doğrulanmayan:** yeni görünüm modlarının gerçek pencerede doğru boyutlanması, oto-gizle animasyonunun
+  gerçek fare olaylarıyla davranışı, favori hızlı değiştirme popup'ının gerçek ekranda konumlanması,
+  `LiveIndicator` animasyonlarının gerçek GPU/WPF render hattında çalışması. Bunlar yalnızca gerçek
+  Windows 11 + WPF derleyicisiyle doğrulanabilir; bkz. [MANUAL_TEST.md](MANUAL_TEST.md) §6b.
+- **Bilinçli olarak eklenmedi:** ses görselleştirici (gerçek PCM seviyesi gerektirir, bkz. CHANGELOG.md).
 
 ## Ortam kısıtları
 

@@ -128,4 +128,9 @@ public partial class MiniWidgetWindow : Window, IForceClosable
 
     private void OnDisplaySettingsChanged(object? sender, EventArgs e) =>
         Dispatcher.InvokeAsync(EnsureOnScreen);
+
+    /// <summary>"Kontrolleri otomatik gizle" açıkken ikincil düğmeleri belirir; kapalıyken hep görünürler (bkz. ShowSecondaryControls).</summary>
+    private void OnRootMouseEnter(object sender, MouseEventArgs e) => _viewModel.OnPointerEnter();
+
+    private void OnRootMouseLeave(object sender, MouseEventArgs e) => _viewModel.OnPointerLeave();
 }

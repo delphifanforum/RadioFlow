@@ -48,10 +48,20 @@ ve sonuçları işaretleyin. Sorun olursa `%LOCALAPPDATA%\RadioFlow\Logs` altın
 - [ ] Sürükleyerek taşınıyor; uygulama yeniden açıldığında aynı konumda
 - [ ] "Konumu sabitle" açıkken sürüklenemiyor
 - [ ] Her zaman üstte açık/kapalı çalışıyor
-- [ ] Boyut: Kompakt / Normal / Büyük (sağ tık menüsü ve Ayarlar)
+- [ ] Boyut: Kompakt / Normal / Genişletilmiş (sağ tık menüsü ve Ayarlar) — her biri farklı içerik gösteriyor
+- [ ] Kompakt modda yalnızca logo, isim, canlı gösterge ve oynat/duraklat görünüyor; içerik taşmıyor
+- [ ] Genişletilmiş modda yazı tipleri ve logo büyüyor, içerik kırpılmıyor
 - [ ] İkinci monitöre taşıyıp monitörü çıkarın: widget görünür alana geri geliyor
 - [ ] Sağ tık menüsündeki tüm öğeler çalışıyor
 - [ ] Kapat (×): "Tepsiye küçült" açıksa gizleniyor ve ses devam ediyor; kapalıysa (panel de kapalıyken) uygulama çıkıyor
+
+### 6b. RadioFlow 2.0 — yeni widget özellikleri
+- [ ] Ayarlar → "Kontrolleri otomatik gizle" kapalıyken: tüm düğmeler (önceki/sonraki/durdur/favori/ses/genişlet) her zaman görünür
+- [ ] Açıkken: fare widget dışındayken yalnızca logo/isim/canlı gösterge/oynat-duraklat görünür; fare widget üzerine gelince diğer düğmeler ~150 ms içinde yumuşakça belirir, fare ayrılınca kaybolur
+- [ ] Oto-gizle açıkken bile Tab ile klavye odağı tüm düğmelere ulaşabiliyor (odak görünür olduğunda düğmeler de görünür hale geliyor)
+- [ ] Canlı yayın göstergesi: Oynatırken yumuşak "nefes alma" animasyonu (mor nokta); bağlanırken/arabelleğe alırken dönen halka; duraklatıldığında sabit soluk nokta; bağlantı hatasında sabit kırmızı nokta
+- [ ] İstasyon adına tıklanınca favori listesi popup olarak açılıyor; listeden bir istasyona tıklayınca o istasyon çalmaya başlıyor ve popup kapanıyor; favori yoksa panel boş açılıyor (hata vermiyor)
+- [ ] Widget opaklık kaydırıcısı artık %50 ile %100 arasında (önceki minimum %30 değil)
 
 ## 7. Sistem entegrasyonu
 - [ ] Tepsi menüsü: Aç, Oynat/Duraklat, Önceki, Sonraki, Sessize Al, Çıkış
