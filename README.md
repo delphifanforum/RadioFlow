@@ -4,31 +4,65 @@ Windows 11 için modern, hafif ve bağımsız çalışan bir **internet radyosu 
 Masaüstünde duran kompakt bir mini oynatıcı ile istasyon arayıp keşfedebileceğiniz büyük bir panelden oluşur.
 Tüm arayüz Türkçedir.
 
-> **Durum:** v0.1.0 (MVP + Faz 2/3'ün büyük bölümü). Neyin test edildiği ve neyin edilmediği [ROADMAP.md](ROADMAP.md)
-> ve [docs/VERIFICATION.md](docs/VERIFICATION.md) içinde açıkça listelenmiştir. WPF arayüzü henüz gerçek bir Windows
-> makinesinde derlenip çalıştırılmamıştır. İlk iş olarak `.\build.ps1` çalıştırın.
+> **Durum:** v0.2.0 ("RadioFlow 2.0" — premium widget güncellemesi, MVP + Faz 2/3'ün büyük bölümü üzerine).
+> Neyin test edildiği ve neyin edilmediği [ROADMAP.md](ROADMAP.md) ve [docs/VERIFICATION.md](docs/VERIFICATION.md)
+> içinde açıkça listelenmiştir. WPF arayüzünün gerçek derleyiciden geçtiği, yayıncının kendi Windows
+> makinesinde `.\build.ps1` ile üretilen `RadioFlow.exe` dosyasıyla doğrulanmıştır; en güncel değişiklikler
+> için yine de `.\build.ps1` çalıştırmanız önerilir.
+
+## İçindekiler
+
+- [Özellikler](#özellikler)
+- [Ekran görüntüleri](#ekran-görüntüleri)
+- [Kullanılan teknolojiler](#kullanılan-teknolojiler)
+- [Kurulum ve derleme](#kurulum-ve-derleme)
+- [Çalıştırma](#çalıştırma)
+- [Klasör yapısı](#klasör-yapısı)
+- [Radyo ekleme](#radyo-ekleme)
+- [Ayarlar](#ayarlar)
+- [Sorun giderme](#sorun-giderme)
+- [Veri ve gizlilik](#veri-ve-gizlilik)
+- [Lisans](#lisans)
 
 ## Özellikler
 
-- **Mini widget** (360×150): logo, istasyon adı, şarkı bilgisi (ICY), oynat/duraklat, durdur, önceki/sonraki favori,
-  ses ve sessiz, favori, büyük pencereye geçiş, konum sabitleme, her zaman üstte, sağ tık menüsü ve 3 boyut seçeneği.
-- **Büyük panel** (1050×700): Ana Sayfa, Tüm Radyolar, Favoriler, Son Dinlenenler, Ülkelere Göre ve Türlere Göre sayfaları,
-  ayrıca Ayarlar. Üstte arama, altta sabit "Now Playing" çubuğu bulunur.
+- **Mini widget**, üç görünüm modunda: **Kompakt** (yalnızca logo, isim, canlı gösterge, oynat/duraklat),
+  **Normal** (360×150, tüm temel kontroller) ve **Genişletilmiş** (daha büyük yazı tipi ve alan). Mod sağ tık
+  menüsünden seçilir ve kalıcıdır.
+- **Otomatik gizlenen kontroller** (isteğe bağlı): açıkken önceki/sonraki, durdur, favori, ses ve büyük
+  pencereye geçiş düğmeleri yalnızca fare widget üzerindeyken yumuşak bir animasyonla belirir; kapalıyken
+  (varsayılan) her zaman görünür. Klavye erişimi bu ayardan etkilenmez.
+- **Animasyonlu canlı yayın göstergesi**: oynatırken nefes alır gibi yumuşak mor nokta, bağlanırken/
+  arabelleğe alırken dönen halka, duraklatıldığında sabit soluk nokta, bağlantı hatasında sabit kırmızı nokta.
+  Animasyonlar yalnızca gerekli durumda çalışır, boştayken CPU harcamaz.
+- **Favori hızlı değiştirme paneli**: widget üzerinde istasyon adına tıklayınca açılan küçük bir listeden
+  favori istasyonlar arasında anında geçiş yapılır.
+- **Büyük panel** (1050×700): Ana Sayfa, Tüm Radyolar, Favoriler, Son Dinlenenler, Ülkelere Göre ve Türlere Göre
+  sayfaları, ayrıca Ayarlar. Üstte arama, altta sabit "Now Playing" çubuğu bulunur.
 - **Radio Browser API**: Türkçe karakterlerle arama, ülke ve tür filtresi, popüler istasyonlar, sunucu keşfi,
   yedek sunucuya geçiş ve zaman aşımı. Çevrimdışıyken **yerel önbellekten** listeleme yapılır.
 - **Tek merkezi oynatıcı (LibVLC)**: HTTP/HTTPS, MP3/AAC/OGG yayınları ile M3U/PLS çözümleme.
   Bağlantı koparsa artan gecikmelerle sınırlı sayıda yeniden bağlanılır. İstasyon değişince eski işlemler iptal edilir.
 - **SQLite**: favoriler (sıralanabilir), dinleme geçmişi, istasyon önbelleği ve ayarlar.
   Veriler `%LOCALAPPDATA%\RadioFlow` altında tutulur.
-- **Windows entegrasyonu**: sistem tepsisi, medya tuşları ve kilit ekranı bilgisi (SMTC), başlangıçta çalıştırma
-  (EXE için HKCU Run, MSIX için StartupTask) ve tek örnek koruması.
-- **Görünüm**: koyu, açık ve sistem temaları. Windows 11 Acrylic/Mica arka planı (DWM) desteklenmeyen sistemlerde düz renge döner.
-  Yuvarlatılmış köşeler ve Per-Monitor V2 DPI desteği vardır.
+- **Windows entegrasyonu**: sistem tepsisi (oynat/duraklat, önceki/sonraki, sessize al dahil), medya tuşları ve
+  kilit ekranı bilgisi (SMTC), başlangıçta çalıştırma (EXE için HKCU Run, MSIX için StartupTask), pencere
+  konumu/çoklu monitör/DPI takibi ve tek örnek koruması.
+- **Görünüm**: koyu, açık ve sistem temaları; mor vurgu rengiyle Fluent Design. Windows 11 Acrylic/Mica arka
+  planı (DWM), desteklenmeyen sistemlerde düz renge döner. Yuvarlatılmış köşeler ve Per-Monitor V2 DPI desteği vardır.
 - **Güvenlik**: yalnızca http/https adresleri kabul edilir. `file:`, `javascript:` ve benzeri şemalar reddedilir.
   Katalog verisinde yerel ağ adresleri engellenir. Logolar boyut ve imza denetimiyle indirilir.
   Yönetici yetkisi istenmez.
 - **Loglama**: Serilog ile `%LOCALAPPDATA%\RadioFlow\Logs` altında günlük dönen dosyalara yazılır
   (dosya başına 10 MB, en fazla 14 dosya).
+
+Henüz eklenmemiş (bkz. [ROADMAP.md](ROADMAP.md)): gerçek ses seviyesine dayalı bir ses görselleştirici. Bunun
+neden bu sürüme bilinçli olarak eklenmediği [CHANGELOG.md](CHANGELOG.md) içinde açıklanmıştır.
+
+## Ekran görüntüleri
+
+_Henüz eklenmedi._ Bir ekran görüntüsü eklemek isterseniz `docs/screenshots/` altına koyup buraya
+`![Mini widget](docs/screenshots/widget.png)` şeklinde referans verebilirsiniz.
 
 ## Kullanılan teknolojiler
 
@@ -43,7 +77,7 @@ Tüm arayüz Türkçedir.
 | Serilog (+Sinks.File, +Extensions.Hosting) | 4.4.0 / 7.0.0 / 10.0.0 | Loglama |
 | xunit.v3 | 4.0.3 | Testler (Microsoft Testing Platform) |
 
-Paket sürümleri 13.11.2026'da nuget.org üzerinden doğrulandı ve `Directory.Packages.props` içinde merkezi olarak tutulur.
+Paket sürümleri nuget.org üzerinden doğrulandı ve `Directory.Packages.props` içinde merkezi olarak tutulur.
 Tema için hazır bir kütüphane (WPF UI vb.) yerine kendi stillerimiz ve doğrudan DWM API'si kullanıldı.
 Bu sayede bağımlılık sayısı düşük kaldı.
 
@@ -52,7 +86,8 @@ Bu sayede bağımlılık sayısı düşük kaldı.
 Gereksinimler: Windows 10 19041+ (önerilen: Windows 11 22H2+), [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (x64).
 
 ```powershell
-cd E:\RadioFlow
+git clone https://github.com/<kullanici-adiniz>/RadioFlow.git
+cd RadioFlow
 .\build.ps1                 # ortam kontrolü + restore + Release build + test + win-x64 publish + LibVLC doğrulaması
 ```
 
@@ -101,7 +136,8 @@ src/
     Views/                   MiniWidgetWindow, MainWindow, SettingsWindow
     ViewModels/              PlayerViewModel (paylaşılan), Widget, Main, Settings, sayfa VM'leri
     Services/                Shell, tema, DWM arka planı, tepsi, SMTC, başlangıç seçici, tek örnek
-    Controls/ Converters/ Themes/ Resources/ Assets/ Interop/
+    Controls/                StationLogo, LiveIndicator
+    Converters/ Themes/ Resources/ Assets/ Interop/
 tests/RadioFlow.Tests/       xUnit v3 testleri (gerçek internet veya yayın gerektirmez)
 packaging/                   MSIX manifest şablonu, görseller, build-msix.ps1
 docs/                        Mimari, doğrulama raporu, manuel test listesi
@@ -113,13 +149,15 @@ docs/                        Mimari, doğrulama raporu, manuel test listesi
 - **Kendi yayınınız:** Büyük panelde **İstasyon Ekle** düğmesine basın. Ad ve `http(s)://` yayın adresi girin
   (`.m3u` / `.pls` de olur). Logo ve tür alanları isteğe bağlıdır. Özel istasyonlar otomatik olarak favorilere eklenir.
   Yerel ağdaki adreslere (ör. `http://192.168.1.20:8000`) yalnızca elle eklenen istasyonlarda izin verilir.
-- **Favori sırası:** Favoriler sayfasındaki ok düğmeleriyle değiştirilir. Widget'taki önceki/sonraki düğmeleri bu sırayı izler.
+- **Favori sırası / hızlı geçiş:** Favoriler sayfasındaki ok düğmeleriyle sıra değiştirilir. Widget'taki
+  önceki/sonraki düğmeleri bu sırayı izler; istasyon adına tıklayarak açılan panelden de doğrudan seçim yapılabilir.
 
 ## Ayarlar
 
-Tema (Koyu/Açık/Sistem), widget arka plan yoğunluğu, widget boyutu, her zaman üstte, büyük pencere boyutu,
-Windows başlangıcında çalıştırma, açılışta widget gösterme, açılışta son radyoyu oynatma, açılış ses seviyesi,
-yeniden bağlanma deneme sayısı ve gecikmesi, tepsiye küçültme, bildirimler, dil ve ana sayfa ülkesi.
+Tema (Koyu/Açık/Sistem), widget arka plan yoğunluğu (%50–%100), widget görünüm modu (Kompakt/Normal/
+Genişletilmiş), kontrolleri otomatik gizleme, her zaman üstte, büyük pencere boyutu, Windows başlangıcında
+çalıştırma, açılışta widget gösterme, açılışta son radyoyu oynatma, açılış ses seviyesi, yeniden bağlanma
+deneme sayısı ve gecikmesi, tepsiye küçültme, bildirimler, dil ve ana sayfa ülkesi.
 Ayarlar SQLite `Settings` tablosunda `app.<Ad>` anahtarlarıyla saklanır. Bozuk bir değer yalnızca o ayarı varsayılana döndürür.
 
 **Başlangıçta çalıştırma** hiçbir zaman kendiliğinden açılmaz:
@@ -144,3 +182,16 @@ RadioFlow hesap oluşturmaz ve telemetri göndermez. Ağ istekleri yalnızca Rad
 (arama ve Radio Browser'ın önerdiği "tıklama" bildirimi), istasyon logolarına ve seçtiğiniz yayın adresine gider.
 İstasyon verileri topluluk tarafından yönetilen [Radio Browser](https://www.radio-browser.info) kataloğundan gelir.
 Yayın içerikleri üçüncü taraflara aittir.
+
+## Lisans
+
+Bu depo için henüz bir lisans dosyası seçilmedi. GitHub'a herkese açık olarak yüklemeden önce bir `LICENSE`
+dosyası eklemeniz önerilir (ör. [MIT](https://choosealicense.com/licenses/mit/),
+[Apache 2.0](https://choosealicense.com/licenses/apache-2.0/) veya tercih ettiğiniz başka bir lisans) —
+lisanssız bir genel depo, varsayılan olarak başkalarının kodu kullanma/dağıtma hakkını kısıtlar.
+
+Ayrıca RadioFlow, ses motoru olarak **LibVLC**'yi (VideoLAN, LGPL-2.1) `LibVLCSharp` ve
+`VideoLAN.LibVLC.Windows` paketleri üzerinden kullanır; bu yerel kütüphaneler derleme çıktısında
+(`libvlc\win-x64\`) birlikte dağıtılır. Uygulamayı dağıtıyorsanız LGPL-2.1'in dinamik bağlama koşullarına
+uyduğunuzdan emin olun. Bu bir hukuki tavsiye değildir; bağlayıcı bir değerlendirme için bir avukata
+danışmanız önerilir.
